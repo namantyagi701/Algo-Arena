@@ -1,11 +1,10 @@
 import { Link, useLocation } from "react-router";
-import { BookOpenIcon, LayoutDashboardIcon, SparklesIcon } from "lucide-react";
-import { UserButton } from "@clerk/clerk-react";
+import { BookOpenIcon, LayoutDashboardIcon, LogOutIcon, SparklesIcon } from "lucide-react";
+import { useAuth } from "../context/AuthContext";
 
 function Navbar() {
   const location = useLocation();
-
-  console.log(location);
+  const { user, logout } = useAuth();
 
   const isActive = (path) => location.pathname === path;
 
@@ -66,8 +65,37 @@ function Navbar() {
             </div>
           </Link>
 
-          <div className="ml-4 mt-2">
-            <UserButton />
+          {/* User avatar + logout dropdown */}
+          <div className="dropdown dropdown-end ml-4">
+            <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar">
+              <div className="w-10 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
+                {user?.profileImage ? (
+                  <img src={user.profileImage} alt={user.name} />
+                ) : (
+                  <div className="bg-gradient-to-br from-primary to-secondary flex items-center justify-center w-full h-full text-white font-bold text-lg">
+                    {user?.name?.charAt(0)?.toUpperCase() || "?"}
+                  </div>
+                )}
+              </div>
+            </div>
+            <ul
+              tabIndex={0}
+              className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow-lg border border-base-300"
+            >
+              <li className="menu-title">
+                <span className="text-base-content font-semibold">{user?.name}</span>
+              </li>
+              <li className="menu-title">
+                <span className="text-base-content/50 text-xs">{user?.email}</span>
+              </li>
+              <div className="divider my-0"></div>
+              <li>
+                <button onClick={logout} className="text-error">
+                  <LogOutIcon className="size-4" />
+                  Logout
+                </button>
+              </li>
+            </ul>
           </div>
         </div>
       </div>

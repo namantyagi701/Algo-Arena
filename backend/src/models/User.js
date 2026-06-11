@@ -11,14 +11,13 @@ const userSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
+    password: {
+      type: String,
+      required: true,
+    },
     profileImage: {
       type: String,
       default: "",
-    },
-    clerkId: {
-      type: String,
-      required: true,
-      unique: true,
     },
   },
   { timestamps: true } // createdAt, updatedAt

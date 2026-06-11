@@ -1,13 +1,12 @@
 import express from "express";
 import path from "path";
 import cors from "cors";
-import { serve } from "inngest/express";
-import { clerkMiddleware } from "@clerk/express";
+import cookieParser from "cookie-parser";
 
 import { ENV } from "./lib/env.js";
 import { connectDB } from "./lib/db.js";
-import { inngest, functions } from "./lib/inngest.js";
 
+import authRoutes from "./routes/authRoutes.js";
 import chatRoutes from "./routes/chatRoutes.js";
 import sessionRoutes from "./routes/sessionRoute.js";
 
@@ -17,11 +16,18 @@ const __dirname = path.resolve();
 
 // middleware
 app.use(express.json());
+app.use(cookieParser());
 // credentials:true meaning?? => server allows a browser to include cookies on request
-app.use(cors({ origin: ENV.CLIENT_URL, credentials: true }));
-app.use(clerkMiddleware()); // this adds auth field to request object: req.auth()
+app.use(cors({
+  origin: [
+    "http://localhost:5173",
+    "http://localhost:5174",
+    "http://localhost:5176"
+  ],
+  credentials: true,
+}));
 
-app.use("/api/inngest", serve({ client: inngest, functions }));
+app.use("/api/auth", authRoutes);
 app.use("/api/chat", chatRoutes);
 app.use("/api/sessions", sessionRoutes);
 
@@ -41,6 +47,7 @@ if (ENV.NODE_ENV === "production") {
 const startServer = async () => {
   try {
     await connectDB();
+    
     app.listen(ENV.PORT, () => console.log("Server is running on port:", ENV.PORT));
   } catch (error) {
     console.error("💥 Error starting the server", error);
