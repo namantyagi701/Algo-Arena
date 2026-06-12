@@ -3,7 +3,7 @@ import { useNavigate } from "react-router";
 import { useMutation } from "@tanstack/react-query";
 import { adminApi } from "../../api/admin";
 import toast from "react-hot-toast";
-import { PlusIcon, Trash2Icon, Loader2Icon, ArrowLeftIcon } from "lucide-react";
+import { PlusIcon, Trash2Icon, Loader2Icon, ArrowLeftIcon, EyeOffIcon, EyeIcon } from "lucide-react";
 
 const EMPTY_FORM = {
   title: "",
@@ -13,7 +13,9 @@ const EMPTY_FORM = {
   descriptionNotes: [""],
   examples: [{ input: "", output: "", explanation: "" }],
   constraints: [""],
+  functionName: "",
   starterCode: { javascript: "", python: "", java: "" },
+  testCases: [{ input: "", expectedOutput: "", isHidden: false }],
   expectedOutput: { javascript: "", python: "", java: "" },
 };
 
@@ -50,7 +52,9 @@ function AdminAddProblemPage() {
       },
       examples: form.examples.filter((ex) => ex.input.trim() || ex.output.trim()),
       constraints: form.constraints.filter((c) => c.trim()),
+      functionName: form.functionName,
       starterCode: form.starterCode,
+      testCases: form.testCases.filter((tc) => tc.input.trim() || tc.expectedOutput.trim()),
       expectedOutput: form.expectedOutput,
     };
 
@@ -114,17 +118,30 @@ function AdminAddProblemPage() {
                 />
               </div>
             </div>
-            <div className="form-control mt-2">
-              <label className="label"><span className="label-text font-medium">Difficulty *</span></label>
-              <select
-                className="select select-bordered w-full md:w-48"
-                value={form.difficulty}
-                onChange={(e) => setForm({ ...form, difficulty: e.target.value })}
-              >
-                <option value="Easy">Easy</option>
-                <option value="Medium">Medium</option>
-                <option value="Hard">Hard</option>
-              </select>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
+              <div className="form-control">
+                <label className="label"><span className="label-text font-medium">Difficulty *</span></label>
+                <select
+                  className="select select-bordered w-full"
+                  value={form.difficulty}
+                  onChange={(e) => setForm({ ...form, difficulty: e.target.value })}
+                >
+                  <option value="Easy">Easy</option>
+                  <option value="Medium">Medium</option>
+                  <option value="Hard">Hard</option>
+                </select>
+              </div>
+              <div className="form-control">
+                <label className="label"><span className="label-text font-medium">Function Name *</span></label>
+                <input
+                  type="text"
+                  className="input input-bordered"
+                  value={form.functionName}
+                  onChange={(e) => setForm({ ...form, functionName: e.target.value })}
+                  placeholder="e.g. twoSum"
+                />
+                <label className="label"><span className="label-text-alt text-base-content/50">The function name to call in the test runner</span></label>
+              </div>
             </div>
           </div>
         </div>
@@ -245,10 +262,78 @@ function AdminAddProblemPage() {
           </div>
         </div>
 
+        {/* Test Cases */}
+        <div className="card bg-base-100 shadow-md">
+          <div className="card-body">
+            <h2 className="card-title text-lg mb-2">Test Cases</h2>
+            <p className="text-sm text-base-content/50 mb-3">
+              Define test cases with JSON-formatted inputs. Hidden test cases are used during submission but never shown to users.
+            </p>
+            {form.testCases.map((tc, i) => (
+              <div key={i} className={`border rounded-lg p-4 mb-3 ${tc.isHidden ? "border-warning/40 bg-warning/5" : "border-base-300"}`}>
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-semibold text-base-content/60">Test Case {i + 1}</span>
+                    {tc.isHidden && (
+                      <span className="badge badge-warning badge-xs gap-1">
+                        <EyeOffIcon className="size-3" /> Hidden
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <label className="label cursor-pointer gap-2 py-0">
+                      <span className="label-text text-xs">Hidden</span>
+                      <input
+                        type="checkbox"
+                        className="toggle toggle-warning toggle-xs"
+                        checked={tc.isHidden}
+                        onChange={(e) => updateArrayItem("testCases", i, { ...tc, isHidden: e.target.checked })}
+                      />
+                    </label>
+                    {form.testCases.length > 1 && (
+                      <button type="button" className="btn btn-ghost btn-xs text-error" onClick={() => removeArrayItem("testCases", i)}>
+                        <Trash2Icon className="size-3" />
+                      </button>
+                    )}
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div className="form-control">
+                    <label className="label py-1"><span className="label-text text-xs">Input (JSON array of args)</span></label>
+                    <input
+                      type="text"
+                      className="input input-bordered input-sm font-mono"
+                      value={tc.input}
+                      onChange={(e) => updateArrayItem("testCases", i, { ...tc, input: e.target.value })}
+                      placeholder='e.g. [[2,7,11,15], 9]'
+                    />
+                  </div>
+                  <div className="form-control">
+                    <label className="label py-1"><span className="label-text text-xs">Expected Output</span></label>
+                    <input
+                      type="text"
+                      className="input input-bordered input-sm font-mono"
+                      value={tc.expectedOutput}
+                      onChange={(e) => updateArrayItem("testCases", i, { ...tc, expectedOutput: e.target.value })}
+                      placeholder='e.g. [0,1]'
+                    />
+                  </div>
+                </div>
+              </div>
+            ))}
+            <button type="button" className="btn btn-ghost btn-sm w-fit gap-1" onClick={() => addArrayItem("testCases", { input: "", expectedOutput: "", isHidden: false })}>
+              <PlusIcon className="size-4" /> Add Test Case
+            </button>
+          </div>
+        </div>
+
         {/* Starter Code */}
         <div className="card bg-base-100 shadow-md">
           <div className="card-body">
             <h2 className="card-title text-lg mb-2">Starter Code</h2>
+            <p className="text-sm text-base-content/50 mb-3">
+              Function/class skeleton only — do not include test case calls.
+            </p>
             {["javascript", "python", "java"].map((lang) => (
               <div key={lang} className="form-control mt-2">
                 <label className="label">
@@ -268,7 +353,10 @@ function AdminAddProblemPage() {
         {/* Expected Output */}
         <div className="card bg-base-100 shadow-md">
           <div className="card-body">
-            <h2 className="card-title text-lg mb-2">Expected Output</h2>
+            <h2 className="card-title text-lg mb-2">Expected Output (Legacy)</h2>
+            <p className="text-sm text-base-content/50 mb-3">
+              Optional — kept for backward compatibility. Test cases above are the primary verification method.
+            </p>
             {["javascript", "python", "java"].map((lang) => (
               <div key={lang} className="form-control mt-2">
                 <label className="label">

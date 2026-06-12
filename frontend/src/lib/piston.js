@@ -38,6 +38,152 @@ export async function executeCode(language, code) {
   };
 }
 
+/**
+ * Execute user code with visible test cases using dynamic runner generation.
+ * This builds a combined source (user code + test runner) and executes in a single call.
+ *
+ * @param {string} language - programming language
+ * @param {string} userCode - the user's solution code (function only)
+ * @param {string} functionName - the function to call
+ * @param {Array} testCases - array of { input, expectedOutput } (visible only)
+ * @returns {Promise<{success:boolean, output?:string, error?:string, testResults?:Array}>}
+ */
+export async function executeWithTestCases(language, userCode, functionName, testCases) {
+  if (!functionName || !testCases || testCases.length === 0) {
+    // Fallback to raw execution if no test cases configured
+    return executeCode(language, userCode);
+  }
+
+  const source = generateRunnerSource(language, userCode, functionName, testCases);
+  const result = await executeCode(language, source);
+
+  if (!result.success) {
+    return result;
+  }
+
+  // Parse output lines and compare against expected
+  const outputLines = result.output.trim().split("\n");
+
+  const testResults = testCases.map((tc, i) => {
+    const actual = outputLines[i] ? normalizeOutput(outputLines[i]) : "";
+    const expected = normalizeOutput(tc.expectedOutput);
+    return {
+      testCase: i + 1,
+      passed: actual === expected,
+      input: tc.input,
+      expected: tc.expectedOutput,
+      actual: (outputLines[i] || "No output").trim(),
+    };
+  });
+
+  const passed = testResults.filter((r) => r.passed).length;
+
+  return {
+    success: true,
+    output: result.output,
+    testResults,
+    passed,
+    total: testCases.length,
+    allPassed: passed === testCases.length,
+  };
+}
+
+/**
+ * Generate a combined source file: user code + test runner
+ */
+function generateRunnerSource(language, userCode, functionName, testCases) {
+  const inputs = testCases.map((tc) => tc.input);
+
+  if (language === "javascript") {
+    const testRunner = inputs
+      .map((input) => `console.log(JSON.stringify(${functionName}(...${input})));`)
+      .join("\n");
+    return `${userCode}\n\n${testRunner}`;
+  }
+
+  if (language === "python") {
+    const testRunner = inputs
+      .map((input) => `print(__import__('json').dumps(${functionName}(*${input})))`)
+      .join("\n");
+    return `${userCode}\n\n${testRunner}`;
+  }
+
+  if (language === "java") {
+    // For Java, inject main method into the Solution class
+    const testCalls = inputs
+      .map((input) => {
+        return `        System.out.println(toJson(${functionName}(${parseJavaArgs(input)})));`;
+      })
+      .join("\n");
+
+    const userCodeTrimmed = userCode.replace(/}\s*$/, "");
+
+    return `import java.util.*;
+
+${userCodeTrimmed}
+
+    private static String toJson(Object obj) {
+        if (obj instanceof int[]) {
+            return Arrays.toString((int[]) obj).replace(" ", "");
+        } else if (obj instanceof char[]) {
+            StringBuilder sb = new StringBuilder("[");
+            char[] arr = (char[]) obj;
+            for (int i = 0; i < arr.length; i++) {
+                if (i > 0) sb.append(",");
+                sb.append("\\"").append(arr[i]).append("\\"");
+            }
+            sb.append("]");
+            return sb.toString();
+        } else if (obj instanceof Boolean) {
+            return String.valueOf(obj);
+        }
+        return String.valueOf(obj);
+    }
+
+    public static void main(String[] args) {
+${testCalls}
+    }
+}`;
+  }
+
+  // Fallback — just run the code as-is
+  return userCode;
+}
+
+/**
+ * Parse JSON array input into Java method arguments
+ */
+function parseJavaArgs(inputStr) {
+  try {
+    const args = JSON.parse(inputStr);
+    return args
+      .map((arg) => {
+        if (Array.isArray(arg)) {
+          if (arg.every((item) => typeof item === "string" && item.length === 1)) {
+            return `new char[]{${arg.map((c) => `'${c}'`).join(", ")}}`;
+          }
+          if (arg.every((item) => typeof item === "string")) {
+            return `new String[]{${arg.map((s) => `"${s}"`).join(", ")}}`;
+          }
+          return `new int[]{${arg.join(", ")}}`;
+        }
+        if (typeof arg === "string") return `"${arg}"`;
+        return String(arg);
+      })
+      .join(", ");
+  } catch {
+    return inputStr;
+  }
+}
+
+function normalizeOutput(output) {
+  return output
+    .trim()
+    .replace(/\[\s+/g, "[")
+    .replace(/\s+\]/g, "]")
+    .replace(/\s*,\s*/g, ",");
+}
+
 async function executeWithWandbox(language, code) {
   const config = WANDBOX_COMPILERS[language];
   if (!config) return null;

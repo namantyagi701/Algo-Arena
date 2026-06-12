@@ -29,11 +29,23 @@ const problemSchema = new mongoose.Schema(
       },
     ],
     constraints: [String],
+    functionName: {
+      type: String,
+      default: "",
+      trim: true,
+    },
     starterCode: {
       javascript: { type: String, default: "" },
       python: { type: String, default: "" },
       java: { type: String, default: "" },
     },
+    testCases: [
+      {
+        input: { type: String, required: true },
+        expectedOutput: { type: String, required: true },
+        isHidden: { type: Boolean, default: false },
+      },
+    ],
     expectedOutput: {
       javascript: { type: String, default: "" },
       python: { type: String, default: "" },

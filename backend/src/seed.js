@@ -24,11 +24,20 @@ const PROBLEMS_DATA = [
       { input: "nums = [3,3], target = 6", output: "[0,1]", explanation: "" },
     ],
     constraints: ["2 ≤ nums.length ≤ 10⁴", "-10⁹ ≤ nums[i] ≤ 10⁹", "-10⁹ ≤ target ≤ 10⁹", "Only one valid answer exists"],
+    functionName: "twoSum",
     starterCode: {
-      javascript: `function twoSum(nums, target) {\n  // Write your solution here\n  \n}\n\n// Test cases\nconsole.log(twoSum([2, 7, 11, 15], 9)); // Expected: [0, 1]\nconsole.log(twoSum([3, 2, 4], 6)); // Expected: [1, 2]\nconsole.log(twoSum([3, 3], 6)); // Expected: [0, 1]`,
-      python: `def twoSum(nums, target):\n    # Write your solution here\n    pass\n\n# Test cases\nprint(twoSum([2, 7, 11, 15], 9))  # Expected: [0, 1]\nprint(twoSum([3, 2, 4], 6))  # Expected: [1, 2]\nprint(twoSum([3, 3], 6))  # Expected: [0, 1]`,
-      java: `import java.util.*;\n\nclass Solution {\n    public static int[] twoSum(int[] nums, int target) {\n        // Write your solution here\n        \n        return new int[0];\n    }\n    \n    public static void main(String[] args) {\n        System.out.println(Arrays.toString(twoSum(new int[]{2, 7, 11, 15}, 9))); // Expected: [0, 1]\n        System.out.println(Arrays.toString(twoSum(new int[]{3, 2, 4}, 6))); // Expected: [1, 2]\n        System.out.println(Arrays.toString(twoSum(new int[]{3, 3}, 6))); // Expected: [0, 1]\n    }\n}`,
+      javascript: `function twoSum(nums, target) {\n  // Write your solution here\n\n}`,
+      python: `def twoSum(nums, target):\n    # Write your solution here\n    pass`,
+      java: `import java.util.*;\n\nclass Solution {\n    public static int[] twoSum(int[] nums, int target) {\n        // Write your solution here\n\n        return new int[0];\n    }\n}`,
     },
+    testCases: [
+      { input: "[[2,7,11,15], 9]", expectedOutput: "[0,1]", isHidden: false },
+      { input: "[[3,2,4], 6]", expectedOutput: "[1,2]", isHidden: false },
+      { input: "[[3,3], 6]", expectedOutput: "[0,1]", isHidden: false },
+      { input: "[[1,5,3,7], 8]", expectedOutput: "[1,2]", isHidden: true },
+      { input: "[[0,4,3,0], 0]", expectedOutput: "[0,3]", isHidden: true },
+      { input: "[[-1,-2,-3,-4,-5], -8]", expectedOutput: "[2,4]", isHidden: true },
+    ],
     expectedOutput: {
       javascript: "[0,1]\n[1,2]\n[0,1]",
       python: "[0, 1]\n[1, 2]\n[0, 1]",
@@ -48,11 +57,19 @@ const PROBLEMS_DATA = [
       { input: 's = ["H","a","n","n","a","h"]', output: '["h","a","n","n","a","H"]', explanation: "" },
     ],
     constraints: ["1 ≤ s.length ≤ 10⁵", "s[i] is a printable ascii character"],
+    functionName: "reverseString",
     starterCode: {
-      javascript: `function reverseString(s) {\n  // Write your solution here\n  \n}\n\n// Test cases\nlet test1 = ["h","e","l","l","o"];\nreverseString(test1);\nconsole.log(test1); // Expected: ["o","l","l","e","h"]\n\nlet test2 = ["H","a","n","n","a","h"];\nreverseString(test2);\nconsole.log(test2); // Expected: ["h","a","n","n","a","H"]`,
-      python: `def reverseString(s):\n    # Write your solution here\n    pass\n\n# Test cases\ntest1 = ["h","e","l","l","o"]\nreverseString(test1)\nprint(test1)  # Expected: ["o","l","l","e","h"]\n\ntest2 = ["H","a","n","n","a","h"]\nreverseString(test2)\nprint(test2)  # Expected: ["h","a","n","n","a","H"]`,
-      java: `import java.util.*;\n\nclass Solution {\n    public static void reverseString(char[] s) {\n        // Write your solution here\n        \n    }\n    \n    public static void main(String[] args) {\n        char[] test1 = {'h','e','l','l','o'};\n        reverseString(test1);\n        System.out.println(Arrays.toString(test1)); // Expected: [o, l, l, e, h]\n        \n        char[] test2 = {'H','a','n','n','a','h'};\n        reverseString(test2);\n        System.out.println(Arrays.toString(test2)); // Expected: [h, a, n, n, a, H]\n    }\n}`,
+      javascript: `function reverseString(s) {\n  // Write your solution here — modify s in-place\n\n}`,
+      python: `def reverseString(s):\n    # Write your solution here — modify s in-place\n    pass`,
+      java: `import java.util.*;\n\nclass Solution {\n    public static void reverseString(char[] s) {\n        // Write your solution here — modify s in-place\n\n    }\n}`,
     },
+    testCases: [
+      { input: '[["h","e","l","l","o"]]', expectedOutput: '["o","l","l","e","h"]', isHidden: false },
+      { input: '[["H","a","n","n","a","h"]]', expectedOutput: '["h","a","n","n","a","H"]', isHidden: false },
+      { input: '[["A","b","c"]]', expectedOutput: '["c","b","A"]', isHidden: true },
+      { input: '[["x"]]', expectedOutput: '["x"]', isHidden: true },
+      { input: '[["a","b","c","d","e","f"]]', expectedOutput: '["f","e","d","c","b","a"]', isHidden: true },
+    ],
     expectedOutput: {
       javascript: '["o","l","l","e","h"]\n["h","a","n","n","a","H"]',
       python: "['o', 'l', 'l', 'e', 'h']\n['h', 'a', 'n', 'n', 'a', 'H']",
@@ -73,11 +90,20 @@ const PROBLEMS_DATA = [
       { input: 's = " "', output: "true", explanation: 's is an empty string "" after removing non-alphanumeric characters.' },
     ],
     constraints: ["1 ≤ s.length ≤ 2 * 10⁵", "s consists only of printable ASCII characters"],
+    functionName: "isPalindrome",
     starterCode: {
-      javascript: `function isPalindrome(s) {\n  // Write your solution here\n  \n}\n\n// Test cases\nconsole.log(isPalindrome("A man, a plan, a canal: Panama")); // Expected: true\nconsole.log(isPalindrome("race a car")); // Expected: false\nconsole.log(isPalindrome(" ")); // Expected: true`,
-      python: `def isPalindrome(s):\n    # Write your solution here\n    pass\n\n# Test cases\nprint(isPalindrome("A man, a plan, a canal: Panama"))  # Expected: True\nprint(isPalindrome("race a car"))  # Expected: False\nprint(isPalindrome(" "))  # Expected: True`,
-      java: `class Solution {\n    public static boolean isPalindrome(String s) {\n        // Write your solution here\n        \n        return false;\n    }\n    \n    public static void main(String[] args) {\n        System.out.println(isPalindrome("A man, a plan, a canal: Panama")); // Expected: true\n        System.out.println(isPalindrome("race a car")); // Expected: false\n        System.out.println(isPalindrome(" ")); // Expected: true\n    }\n}`,
+      javascript: `function isPalindrome(s) {\n  // Write your solution here\n\n}`,
+      python: `def isPalindrome(s):\n    # Write your solution here\n    pass`,
+      java: `class Solution {\n    public static boolean isPalindrome(String s) {\n        // Write your solution here\n\n        return false;\n    }\n}`,
     },
+    testCases: [
+      { input: '["A man, a plan, a canal: Panama"]', expectedOutput: "true", isHidden: false },
+      { input: '["race a car"]', expectedOutput: "false", isHidden: false },
+      { input: '[" "]', expectedOutput: "true", isHidden: false },
+      { input: '["Was it a car or a cat I saw?"]', expectedOutput: "true", isHidden: true },
+      { input: '["no"]', expectedOutput: "false", isHidden: true },
+      { input: '["0P"]', expectedOutput: "false", isHidden: true },
+    ],
     expectedOutput: {
       javascript: "true\nfalse\ntrue",
       python: "True\nFalse\nTrue",
@@ -98,11 +124,21 @@ const PROBLEMS_DATA = [
       { input: "nums = [5,4,-1,7,8]", output: "23", explanation: "The subarray [5,4,-1,7,8] has the largest sum 23." },
     ],
     constraints: ["1 ≤ nums.length ≤ 10⁵", "-10⁴ ≤ nums[i] ≤ 10⁴"],
+    functionName: "maxSubArray",
     starterCode: {
-      javascript: `function maxSubArray(nums) {\n  // Write your solution here\n  \n}\n\n// Test cases\nconsole.log(maxSubArray([-2,1,-3,4,-1,2,1,-5,4])); // Expected: 6\nconsole.log(maxSubArray([1])); // Expected: 1\nconsole.log(maxSubArray([5,4,-1,7,8])); // Expected: 23`,
-      python: `def maxSubArray(nums):\n    # Write your solution here\n    pass\n\n# Test cases\nprint(maxSubArray([-2,1,-3,4,-1,2,1,-5,4]))  # Expected: 6\nprint(maxSubArray([1]))  # Expected: 1\nprint(maxSubArray([5,4,-1,7,8]))  # Expected: 23`,
-      java: `class Solution {\n    public static int maxSubArray(int[] nums) {\n        // Write your solution here\n        \n        return 0;\n    }\n    \n    public static void main(String[] args) {\n        System.out.println(maxSubArray(new int[]{-2,1,-3,4,-1,2,1,-5,4})); // Expected: 6\n        System.out.println(maxSubArray(new int[]{1})); // Expected: 1\n        System.out.println(maxSubArray(new int[]{5,4,-1,7,8})); // Expected: 23\n    }\n}`,
+      javascript: `function maxSubArray(nums) {\n  // Write your solution here\n\n}`,
+      python: `def maxSubArray(nums):\n    # Write your solution here\n    pass`,
+      java: `class Solution {\n    public static int maxSubArray(int[] nums) {\n        // Write your solution here\n\n        return 0;\n    }\n}`,
     },
+    testCases: [
+      { input: "[[-2,1,-3,4,-1,2,1,-5,4]]", expectedOutput: "6", isHidden: false },
+      { input: "[[1]]", expectedOutput: "1", isHidden: false },
+      { input: "[[5,4,-1,7,8]]", expectedOutput: "23", isHidden: false },
+      { input: "[[-1]]", expectedOutput: "-1", isHidden: true },
+      { input: "[[-2,-1]]", expectedOutput: "-1", isHidden: true },
+      { input: "[[1,2,3,4,5]]", expectedOutput: "15", isHidden: true },
+      { input: "[[-2,1]]", expectedOutput: "1", isHidden: true },
+    ],
     expectedOutput: {
       javascript: "6\n1\n23",
       python: "6\n1\n23",
@@ -126,11 +162,19 @@ const PROBLEMS_DATA = [
       { input: "height = [1,1]", output: "1", explanation: "" },
     ],
     constraints: ["n == height.length", "2 ≤ n ≤ 10⁵", "0 ≤ height[i] ≤ 10⁴"],
+    functionName: "maxArea",
     starterCode: {
-      javascript: `function maxArea(height) {\n  // Write your solution here\n  \n}\n\n// Test cases\nconsole.log(maxArea([1,8,6,2,5,4,8,3,7])); // Expected: 49\nconsole.log(maxArea([1,1])); // Expected: 1`,
-      python: `def maxArea(height):\n    # Write your solution here\n    pass\n\n# Test cases\nprint(maxArea([1,8,6,2,5,4,8,3,7]))  # Expected: 49\nprint(maxArea([1,1]))  # Expected: 1`,
-      java: `class Solution {\n    public static int maxArea(int[] height) {\n        // Write your solution here\n        \n        return 0;\n    }\n    \n    public static void main(String[] args) {\n        System.out.println(maxArea(new int[]{1,8,6,2,5,4,8,3,7})); // Expected: 49\n        System.out.println(maxArea(new int[]{1,1})); // Expected: 1\n    }\n}`,
+      javascript: `function maxArea(height) {\n  // Write your solution here\n\n}`,
+      python: `def maxArea(height):\n    # Write your solution here\n    pass`,
+      java: `class Solution {\n    public static int maxArea(int[] height) {\n        // Write your solution here\n\n        return 0;\n    }\n}`,
     },
+    testCases: [
+      { input: "[[1,8,6,2,5,4,8,3,7]]", expectedOutput: "49", isHidden: false },
+      { input: "[[1,1]]", expectedOutput: "1", isHidden: false },
+      { input: "[[4,3,2,1,4]]", expectedOutput: "16", isHidden: true },
+      { input: "[[1,2,1]]", expectedOutput: "2", isHidden: true },
+      { input: "[[2,3,4,5,18,17,6]]", expectedOutput: "17", isHidden: true },
+    ],
     expectedOutput: {
       javascript: "49\n1",
       python: "49\n1",
@@ -164,20 +208,17 @@ async function seed() {
       console.log("✅ Admin user created (admin@talentiq.com / admin123)");
     }
 
-    // 2. Seed problems
-    const existingCount = await Problem.countDocuments();
+    // 2. Seed problems — drop existing and re-seed with updated schema
+    await Problem.deleteMany({});
+    console.log("🗑️  Cleared existing problems");
 
-    if (existingCount > 0) {
-      console.log(`⚡ ${existingCount} problems already exist, skipping seed...`);
-    } else {
-      const problemsWithCreator = PROBLEMS_DATA.map((p) => ({
-        ...p,
-        createdBy: adminUser._id,
-      }));
+    const problemsWithCreator = PROBLEMS_DATA.map((p) => ({
+      ...p,
+      createdBy: adminUser._id,
+    }));
 
-      await Problem.insertMany(problemsWithCreator);
-      console.log(`✅ ${PROBLEMS_DATA.length} problems seeded successfully`);
-    }
+    await Problem.insertMany(problemsWithCreator);
+    console.log(`✅ ${PROBLEMS_DATA.length} problems seeded successfully (with test cases)`);
 
     console.log("\n🎉 Seed completed!");
     process.exit(0);

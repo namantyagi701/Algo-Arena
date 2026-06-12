@@ -11,7 +11,9 @@ export async function createProblem(req, res) {
       description,
       examples,
       constraints,
+      functionName,
       starterCode,
+      testCases,
       expectedOutput,
     } = req.body;
 
@@ -30,7 +32,9 @@ export async function createProblem(req, res) {
       description,
       examples: examples || [],
       constraints: constraints || [],
+      functionName: functionName || "",
       starterCode: starterCode || {},
+      testCases: testCases || [],
       expectedOutput: expectedOutput || {},
       createdBy: req.user._id,
     });
@@ -109,7 +113,9 @@ export async function updateProblem(req, res) {
       description,
       examples,
       constraints,
+      functionName,
       starterCode,
+      testCases,
       expectedOutput,
     } = req.body;
 
@@ -117,18 +123,25 @@ export async function updateProblem(req, res) {
       return res.status(400).json({ message: "Difficulty must be Easy, Medium, or Hard" });
     }
 
+    const updateData = {
+      ...(title && { title }),
+      ...(difficulty && { difficulty }),
+      ...(category && { category }),
+      ...(description && { description }),
+      ...(examples && { examples }),
+      ...(constraints && { constraints }),
+      ...(starterCode && { starterCode }),
+      ...(expectedOutput && { expectedOutput }),
+    };
+
+    // Allow setting functionName even if empty string
+    if (functionName !== undefined) updateData.functionName = functionName;
+    // Allow setting testCases even if empty array
+    if (testCases !== undefined) updateData.testCases = testCases;
+
     const problem = await Problem.findByIdAndUpdate(
       req.params.id,
-      {
-        ...(title && { title }),
-        ...(difficulty && { difficulty }),
-        ...(category && { category }),
-        ...(description && { description }),
-        ...(examples && { examples }),
-        ...(constraints && { constraints }),
-        ...(starterCode && { starterCode }),
-        ...(expectedOutput && { expectedOutput }),
-      },
+      updateData,
       { new: true, runValidators: true }
     );
 

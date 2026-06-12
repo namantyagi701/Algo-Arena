@@ -5,7 +5,8 @@ import { useEndSession, useJoinSession, useSessionById } from "../hooks/useSessi
 import { sessionApi } from "../api/sessions";
 import { useQuery } from "@tanstack/react-query";
 import { problemsApi } from "../api/problems";
-import { executeCode } from "../lib/piston";
+import { submitApi } from "../api/submit";
+import { executeWithTestCases } from "../lib/piston";
 import Navbar from "../components/Navbar";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import { getDifficultyBadgeClass } from "../lib/utils";
@@ -17,12 +18,17 @@ import useStreamClient from "../hooks/useStreamClient";
 import { StreamCall, StreamVideo } from "@stream-io/video-react-sdk";
 import VideoCallUI from "../components/VideoCallUI";
 
+import toast from "react-hot-toast";
+import confetti from "canvas-confetti";
+
 function SessionPage() {
   const navigate = useNavigate();
   const { id } = useParams();
   const { user } = useAuth();
   const [output, setOutput] = useState(null);
+  const [submitResult, setSubmitResult] = useState(null);
   const [isRunning, setIsRunning] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { data: sessionData, isLoading: loadingSession, refetch } = useSessionById(id);
 
@@ -109,15 +115,81 @@ function SessionPage() {
     const starterCode = problemData?.starterCode?.[newLang] || "";
     setCode(starterCode);
     setOutput(null);
+    setSubmitResult(null);
   };
 
+  const triggerConfetti = () => {
+    confetti({
+      particleCount: 80,
+      spread: 250,
+      origin: { x: 0.2, y: 0.6 },
+    });
+
+    confetti({
+      particleCount: 80,
+      spread: 250,
+      origin: { x: 0.8, y: 0.6 },
+    });
+  };
+
+  // Run Code — client-side execution with visible test cases
   const handleRunCode = async () => {
     setIsRunning(true);
     setOutput(null);
+    setSubmitResult(null);
 
-    const result = await executeCode(selectedLanguage, code);
+    const visibleTestCases = problemData?.testCases || [];
+    const functionName = problemData?.functionName;
+
+    const result = await executeWithTestCases(
+      selectedLanguage,
+      code,
+      functionName,
+      visibleTestCases
+    );
+
     setOutput(result);
     setIsRunning(false);
+
+    if (result.testResults) {
+      if (result.allPassed) {
+        toast.success("All visible tests passed! Try submitting.");
+      } else {
+        toast.error(`${result.passed}/${result.total} tests passed.`);
+      }
+    } else if (!result.success) {
+      toast.error("Code execution failed!");
+    }
+  };
+
+  // Submit — server-side execution with hidden test cases
+  const handleSubmitCode = async () => {
+    if (!problemData?._id) {
+      toast.error("Problem not loaded yet");
+      return;
+    }
+
+    setIsSubmitting(true);
+    setOutput(null);
+    setSubmitResult(null);
+
+    try {
+      const result = await submitApi.submit(problemData._id, selectedLanguage, code);
+      setSubmitResult(result);
+
+      if (result.allPassed) {
+        triggerConfetti();
+        toast.success("🎉 All tests passed! Solution accepted!");
+      } else if (result.error) {
+        toast.error("Compilation/Runtime error!");
+      } else {
+        toast.error(`${result.passed}/${result.total} test cases passed.`);
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Submission failed!");
+    }
+
+    setIsSubmitting(false);
   };
 
   const handleEndSession = () => {
@@ -268,16 +340,18 @@ function SessionPage() {
                       selectedLanguage={selectedLanguage}
                       code={code}
                       isRunning={isRunning}
+                      isSubmitting={isSubmitting}
                       onLanguageChange={handleLanguageChange}
                       onCodeChange={(value) => setCode(value)}
                       onRunCode={handleRunCode}
+                      onSubmitCode={handleSubmitCode}
                     />
                   </Panel>
 
                   <PanelResizeHandle className="h-2 bg-base-300 hover:bg-primary transition-colors cursor-row-resize" />
 
                   <Panel defaultSize={30} minSize={15}>
-                    <OutputPanel output={output} />
+                    <OutputPanel output={output} submitResult={submitResult} />
                   </Panel>
                 </PanelGroup>
               </Panel>

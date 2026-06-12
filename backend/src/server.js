@@ -11,6 +11,7 @@ import chatRoutes from "./routes/chatRoutes.js";
 import sessionRoutes from "./routes/sessionRoute.js";
 import adminRoutes from "./routes/adminRoutes.js";
 import problemRoutes from "./routes/problemRoutes.js";
+import submitRoutes from "./routes/submitRoutes.js";
 
 const app = express();
 
@@ -34,6 +35,7 @@ app.use("/api/chat", chatRoutes);
 app.use("/api/sessions", sessionRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/problems", problemRoutes);
+app.use("/api/submit", submitRoutes);
 
 app.get("/health", (req, res) => {
   res.status(200).json({ msg: "api is up and running" });
