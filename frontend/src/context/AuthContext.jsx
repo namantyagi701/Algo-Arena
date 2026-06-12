@@ -9,6 +9,7 @@ export function AuthProvider({ children }) {
   const [isLoaded, setIsLoaded] = useState(false);
 
   const isSignedIn = !!user;
+  const isAdmin = user?.role === "admin";
 
   // check auth on mount (restores session from httpOnly cookie)
   useEffect(() => {
@@ -64,7 +65,7 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, isSignedIn, isLoaded, login, signup, logout }}>
+    <AuthContext.Provider value={{ user, isSignedIn, isAdmin, isLoaded, login, signup, logout }}>
       {children}
     </AuthContext.Provider>
   );

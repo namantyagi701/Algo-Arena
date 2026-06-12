@@ -9,6 +9,8 @@ import { connectDB } from "./lib/db.js";
 import authRoutes from "./routes/authRoutes.js";
 import chatRoutes from "./routes/chatRoutes.js";
 import sessionRoutes from "./routes/sessionRoute.js";
+import adminRoutes from "./routes/adminRoutes.js";
+import problemRoutes from "./routes/problemRoutes.js";
 
 const app = express();
 
@@ -30,6 +32,8 @@ app.use(cors({
 app.use("/api/auth", authRoutes);
 app.use("/api/chat", chatRoutes);
 app.use("/api/sessions", sessionRoutes);
+app.use("/api/admin", adminRoutes);
+app.use("/api/problems", problemRoutes);
 
 app.get("/health", (req, res) => {
   res.status(200).json({ msg: "api is up and running" });

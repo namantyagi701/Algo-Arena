@@ -1,5 +1,6 @@
 import { Code2Icon, LoaderIcon, PlusIcon } from "lucide-react";
-import { PROBLEMS } from "../data/problems";
+import { useQuery } from "@tanstack/react-query";
+import { problemsApi } from "../api/problems";
 
 function CreateSessionModal({
   isOpen,
@@ -9,7 +10,13 @@ function CreateSessionModal({
   onCreateRoom,
   isCreating,
 }) {
-  const problems = Object.values(PROBLEMS);
+  const { data } = useQuery({
+    queryKey: ["problems"],
+    queryFn: problemsApi.getAll,
+    enabled: isOpen,
+  });
+
+  const problems = data?.problems || [];
 
   if (!isOpen) return null;
 
@@ -42,7 +49,7 @@ function CreateSessionModal({
               </option>
 
               {problems.map((problem) => (
-                <option key={problem.id} value={problem.title}>
+                <option key={problem._id} value={problem.title}>
                   {problem.title} ({problem.difficulty})
                 </option>
               ))}

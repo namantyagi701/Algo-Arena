@@ -162,3 +162,51 @@ export async function endSession(req, res) {
     res.status(500).json({ message: "Internal Server Error" });
   }
 }
+
+export async function enterSession(req, res) {
+  try {
+    const { id } = req.params;
+    const userId = req.user._id;
+
+    const session = await Session.findById(id);
+    if (!session) return res.status(404).json({ message: "Session not found" });
+
+    // Only allow host or participant to enter the call session
+    if (
+      session.host.toString() !== userId.toString() &&
+      (!session.participant || session.participant.toString() !== userId.toString())
+    ) {
+      return res.status(403).json({ message: "Unauthorized access to session" });
+    }
+
+    if (!session.connectedUsers.includes(userId)) {
+      session.connectedUsers.push(userId);
+      await session.save();
+    }
+
+    res.status(200).json({ session });
+  } catch (error) {
+    console.log("Error in enterSession controller:", error.message);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+}
+
+export async function leaveSession(req, res) {
+  try {
+    const { id } = req.params;
+    const userId = req.user._id;
+
+    const session = await Session.findById(id);
+    if (!session) return res.status(404).json({ message: "Session not found" });
+
+    session.connectedUsers = session.connectedUsers.filter(
+      (uId) => uId.toString() !== userId.toString()
+    );
+    await session.save();
+
+    res.status(200).json({ session });
+  } catch (error) {
+    console.log("Error in leaveSession controller:", error.message);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+}

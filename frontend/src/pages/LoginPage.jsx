@@ -1,21 +1,35 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { useAuth } from "../context/AuthContext";
-import { SparklesIcon, Loader2Icon, MailIcon, LockIcon, ArrowRightIcon } from "lucide-react";
+import { SparklesIcon, Loader2Icon, MailIcon, LockIcon, ArrowRightIcon, ShieldIcon, UserIcon } from "lucide-react";
+import toast from "react-hot-toast";
 
 function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [loginMode, setLoginMode] = useState("student"); // "student" | "admin"
   const { login } = useAuth();
   const navigate = useNavigate();
+
+  const isAdminMode = loginMode === "admin";
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     try {
-      await login(email, password);
-      navigate("/dashboard");
+      const userData = await login(email, password);
+
+      if (isAdminMode) {
+        if (userData.role !== "admin") {
+          toast.error("This account does not have admin access");
+          setIsLoading(false);
+          return;
+        }
+        navigate("/admin");
+      } else {
+        navigate("/dashboard");
+      }
     } catch {
       // error handled in AuthContext
     } finally {
@@ -38,7 +52,43 @@ function LoginPage() {
           </div>
 
           <h2 className="text-2xl font-bold text-center mb-2">Welcome Back</h2>
-          <p className="text-center text-base-content/60 mb-6">Sign in to continue coding</p>
+          <p className="text-center text-base-content/60 mb-4">Sign in to continue</p>
+
+          {/* Login Mode Toggle */}
+          <div className="flex bg-base-200 rounded-xl p-1 mb-6">
+            <button
+              type="button"
+              onClick={() => setLoginMode("student")}
+              className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200
+                ${!isAdminMode
+                  ? "bg-primary text-primary-content shadow-md"
+                  : "text-base-content/60 hover:text-base-content"
+                }`}
+            >
+              <UserIcon className="size-4" />
+              Student
+            </button>
+            <button
+              type="button"
+              onClick={() => setLoginMode("admin")}
+              className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200
+                ${isAdminMode
+                  ? "bg-error text-error-content shadow-md"
+                  : "text-base-content/60 hover:text-base-content"
+                }`}
+            >
+              <ShieldIcon className="size-4" />
+              Admin
+            </button>
+          </div>
+
+          {/* Admin mode indicator */}
+          {isAdminMode && (
+            <div className="alert alert-warning py-2 mb-2 text-sm">
+              <ShieldIcon className="size-4" />
+              <span>Admin login — requires administrator credentials</span>
+            </div>
+          )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="form-control">
@@ -49,7 +99,7 @@ function LoginPage() {
                 <MailIcon className="size-4 text-base-content/40" />
                 <input
                   type="email"
-                  placeholder="you@example.com"
+                  placeholder={isAdminMode ? "admin@talentiq.com" : "you@example.com"}
                   className="grow"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -77,28 +127,32 @@ function LoginPage() {
 
             <button
               type="submit"
-              className="btn btn-primary w-full"
+              className={`btn w-full ${isAdminMode ? "btn-error" : "btn-primary"}`}
               disabled={isLoading}
             >
               {isLoading ? (
                 <Loader2Icon className="size-5 animate-spin" />
               ) : (
                 <>
-                  Sign In
+                  {isAdminMode ? "Sign In as Admin" : "Sign In"}
                   <ArrowRightIcon className="size-4" />
                 </>
               )}
             </button>
           </form>
 
-          <div className="divider">OR</div>
+          {!isAdminMode && (
+            <>
+              <div className="divider">OR</div>
 
-          <p className="text-center text-sm text-base-content/60">
-            Don&apos;t have an account?{" "}
-            <Link to="/signup" className="link link-primary font-semibold">
-              Create one
-            </Link>
-          </p>
+              <p className="text-center text-sm text-base-content/60">
+                Don&apos;t have an account?{" "}
+                <Link to="/signup" className="link link-primary font-semibold">
+                  Create one
+                </Link>
+              </p>
+            </>
+          )}
         </div>
       </div>
     </div>

@@ -2,7 +2,9 @@ import { useAuth } from "../context/AuthContext";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import { useEndSession, useJoinSession, useSessionById } from "../hooks/useSessions";
-import { PROBLEMS } from "../data/problems";
+import { sessionApi } from "../api/sessions";
+import { useQuery } from "@tanstack/react-query";
+import { problemsApi } from "../api/problems";
 import { executeCode } from "../lib/piston";
 import Navbar from "../components/Navbar";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
@@ -38,9 +40,14 @@ function SessionPage() {
     isParticipant
   );
 
-  // find the problem data based on session problem title
+  // fetch all problems and find by title
+  const { data: problemsData } = useQuery({
+    queryKey: ["problems"],
+    queryFn: problemsApi.getAll,
+  });
+
   const problemData = session?.problem
-    ? Object.values(PROBLEMS).find((p) => p.title === session.problem)
+    ? problemsData?.problems?.find((p) => p.title === session.problem)
     : null;
 
   const [selectedLanguage, setSelectedLanguage] = useState("javascript");
@@ -62,6 +69,31 @@ function SessionPage() {
 
     if (session.status === "completed") navigate("/dashboard");
   }, [session, loadingSession, navigate]);
+
+  // Track entering/leaving session in DB
+  useEffect(() => {
+    if (!id || !user) return;
+
+    // Call enter session when entering the page
+    sessionApi.enterSession(id).then(refetch).catch(console.error);
+
+    const handleUnload = () => {
+      const baseUrl = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
+      fetch(`${baseUrl}/sessions/${id}/leave`, {
+        method: "POST",
+        credentials: "include",
+        keepalive: true,
+      });
+    };
+
+    window.addEventListener("beforeunload", handleUnload);
+
+    return () => {
+      // Call leave session when component unmounts
+      sessionApi.leaveSession(id).catch(console.error);
+      window.removeEventListener("beforeunload", handleUnload);
+    };
+  }, [id, user, refetch]);
 
   // update code when problem loads or changes
   useEffect(() => {
@@ -119,7 +151,7 @@ function SessionPage() {
                         )}
                         <p className="text-base-content/60 mt-2">
                           Host: {session?.host?.name || "Loading..."} •{" "}
-                          {session?.participant ? 2 : 1}/2 participants
+                          {session?.connectedUsers?.length || 0}/2 on call
                         </p>
                       </div>
 

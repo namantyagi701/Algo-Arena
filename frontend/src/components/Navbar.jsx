@@ -1,10 +1,10 @@
 import { Link, useLocation } from "react-router";
-import { BookOpenIcon, LayoutDashboardIcon, LogOutIcon, SparklesIcon } from "lucide-react";
+import { BookOpenIcon, LayoutDashboardIcon, LogOutIcon, SparklesIcon, ShieldIcon } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 
 function Navbar() {
   const location = useLocation();
-  const { user, logout } = useAuth();
+  const { user, logout, isAdmin } = useAuth();
 
   const isActive = (path) => location.pathname === path;
 
@@ -64,6 +64,25 @@ function Navbar() {
               <span className="font-medium hidden sm:inline">Dashbord</span>
             </div>
           </Link>
+
+          {/* ADMIN LINK (admin only) */}
+          {isAdmin && (
+            <Link
+              to="/admin"
+              className={`px-4 py-2.5 rounded-lg transition-all duration-200 
+                ${
+                  location.pathname.startsWith("/admin")
+                    ? "bg-primary text-primary-content"
+                    : "hover:bg-base-200 text-base-content/70 hover:text-base-content"
+                }
+              `}
+            >
+              <div className="flex items-center gap-x-2.5">
+                <ShieldIcon className="size-4" />
+                <span className="font-medium hidden sm:inline">Admin</span>
+              </div>
+            </Link>
+          )}
 
           {/* User avatar + logout dropdown */}
           <div className="dropdown dropdown-end ml-4">

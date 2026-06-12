@@ -4,8 +4,8 @@ import User from "../models/User.js";
 import { ENV } from "../lib/env.js";
 import { upsertStreamUser } from "../lib/stream.js";
 
-const generateToken = (userId) => {
-  return jwt.sign({ userId }, ENV.JWT_SECRET, { expiresIn: "7d" });
+const generateToken = (userId, role) => {
+  return jwt.sign({ userId, role }, ENV.JWT_SECRET, { expiresIn: "7d" });
 };
 
 const setCookie = (res, token) => {
@@ -50,13 +50,14 @@ export async function signup(req, res) {
       image: user.profileImage,
     });
 
-    const token = generateToken(user._id);
+    const token = generateToken(user._id, user.role);
     setCookie(res, token);
 
     res.status(201).json({
       _id: user._id,
       name: user.name,
       email: user.email,
+      role: user.role,
       profileImage: user.profileImage,
     });
   } catch (error) {
@@ -83,13 +84,14 @@ export async function login(req, res) {
       return res.status(400).json({ message: "Invalid email or password" });
     }
 
-    const token = generateToken(user._id);
+    const token = generateToken(user._id, user.role);
     setCookie(res, token);
 
     res.status(200).json({
       _id: user._id,
       name: user.name,
       email: user.email,
+      role: user.role,
       profileImage: user.profileImage,
     });
   } catch (error) {
@@ -114,6 +116,7 @@ export async function checkAuth(req, res) {
       _id: req.user._id,
       name: req.user.name,
       email: req.user.email,
+      role: req.user.role,
       profileImage: req.user.profileImage,
     });
   } catch (error) {
