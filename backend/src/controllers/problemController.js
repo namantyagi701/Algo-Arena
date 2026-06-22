@@ -1,6 +1,6 @@
 import Problem from "../models/Problem.js";
 
-// GET /api/problems — public list (excludes hidden test cases and solutionTemplate)
+// GET /api/problems — public list (excludes hidden test cases)
 export async function getProblems(req, res) {
   try {
     const problems = await Problem.find()
