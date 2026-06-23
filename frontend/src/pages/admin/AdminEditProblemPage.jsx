@@ -3,12 +3,125 @@ import { useNavigate, useParams } from "react-router";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { adminApi } from "../../api/admin";
 import toast from "react-hot-toast";
-import { PlusIcon, Trash2Icon, Loader2Icon, ArrowLeftIcon, EyeOffIcon } from "lucide-react";
+import {
+  PlusIcon,
+  Trash2Icon,
+  Loader2Icon,
+  ArrowLeftIcon,
+  EyeOffIcon,
+  ChevronDownIcon,
+  ChevronUpIcon,
+  CodeIcon,
+  CopyIcon,
+  CheckIcon,
+} from "lucide-react";
+
+/* ─── Argument helpers (shared with Add page) ─── */
+const ARG_TYPES = [
+  { value: "number", label: "Number" },
+  { value: "string", label: "String" },
+  { value: "number[]", label: "Array of Numbers" },
+  { value: "string[]", label: "Array of Strings" },
+  { value: "boolean", label: "Boolean" },
+  { value: "null", label: "Null" },
+];
+
+function defaultArgValue(type) {
+  switch (type) {
+    case "number":
+      return "";
+    case "string":
+      return "";
+    case "number[]":
+      return "";
+    case "string[]":
+      return "";
+    case "boolean":
+      return "true";
+    case "null":
+      return "";
+    default:
+      return "";
+  }
+}
+
+function createEmptyArg() {
+  return { type: "number", value: "" };
+}
+
+function argToJsonValue(arg) {
+  switch (arg.type) {
+    case "number":
+      return Number(arg.value);
+    case "string":
+      return String(arg.value);
+    case "number[]":
+      return arg.value
+        .split(",")
+        .map((v) => v.trim())
+        .filter(Boolean)
+        .map(Number);
+    case "string[]":
+      return arg.value
+        .split(",")
+        .map((v) => v.trim())
+        .filter(Boolean);
+    case "boolean":
+      return arg.value === "true";
+    case "null":
+      return null;
+    default:
+      return arg.value;
+  }
+}
+
+function argsToJsonString(args) {
+  try {
+    const values = args.map(argToJsonValue);
+    return JSON.stringify(values);
+  } catch {
+    return "[]";
+  }
+}
+
+/**
+ * Parse a JSON input string (e.g. '[[2,7,11,15], 9]') back into structured args.
+ * Falls back to a single string arg if parsing fails.
+ */
+function parseJsonInputToArgs(inputStr) {
+  try {
+    const parsed = JSON.parse(inputStr);
+    if (!Array.isArray(parsed)) {
+      return [{ type: "string", value: inputStr }];
+    }
+    return parsed.map((val) => {
+      if (val === null) return { type: "null", value: "" };
+      if (typeof val === "boolean") return { type: "boolean", value: String(val) };
+      if (typeof val === "number") return { type: "number", value: String(val) };
+      if (typeof val === "string") return { type: "string", value: val };
+      if (Array.isArray(val)) {
+        if (val.every((item) => typeof item === "number")) {
+          return { type: "number[]", value: val.join(", ") };
+        }
+        if (val.every((item) => typeof item === "string")) {
+          return { type: "string[]", value: val.join(", ") };
+        }
+        // Mixed array — fall back to number array
+        return { type: "number[]", value: val.join(", ") };
+      }
+      return { type: "string", value: JSON.stringify(val) };
+    });
+  } catch {
+    return [{ type: "string", value: inputStr }];
+  }
+}
 
 function AdminEditProblemPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [form, setForm] = useState(null);
+  const [showJsonPreview, setShowJsonPreview] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   const { data, isLoading } = useQuery({
     queryKey: ["admin-problem", id],
@@ -25,15 +138,50 @@ function AdminEditProblemPage() {
         category: p.category || "",
         descriptionText: p.description?.text || "",
         descriptionNotes: p.description?.notes?.length ? p.description.notes : [""],
-        examples: p.examples?.length ? p.examples.map((e) => ({ input: e.input || "", output: e.output || "", explanation: e.explanation || "" })) : [{ input: "", output: "", explanation: "" }],
+        examples: p.examples?.length
+          ? p.examples.map((e) => ({ input: e.input || "", output: e.output || "", explanation: e.explanation || "" }))
+          : [{ input: "", output: "", explanation: "" }],
         constraints: p.constraints?.length ? [...p.constraints] : [""],
         functionName: p.functionName || "",
-        starterCode: { javascript: p.starterCode?.javascript || "", python: p.starterCode?.python || "", java: p.starterCode?.java || "" },
-        testCases: p.testCases?.length ? p.testCases.map((tc) => ({ input: tc.input || "", expectedOutput: tc.expectedOutput || "", isHidden: tc.isHidden || false })) : [{ input: "", expectedOutput: "", isHidden: false }],
-        expectedOutput: { javascript: p.expectedOutput?.javascript || "", python: p.expectedOutput?.python || "", java: p.expectedOutput?.java || "" },
+        starterCode: {
+          javascript: p.starterCode?.javascript || "",
+          python: p.starterCode?.python || "",
+          java: p.starterCode?.java || "",
+        },
+        testCases: p.testCases?.length
+          ? p.testCases.map((tc) => ({
+              args: parseJsonInputToArgs(tc.input || "[]"),
+              expectedOutput: tc.expectedOutput || "",
+              isHidden: tc.isHidden || false,
+            }))
+          : [{ args: [createEmptyArg()], expectedOutput: "", isHidden: false }],
       });
     }
   }, [data]);
+
+  const buildPayload = () => {
+    if (!form) return {};
+    return {
+      title: form.title,
+      difficulty: form.difficulty,
+      category: form.category,
+      description: {
+        text: form.descriptionText,
+        notes: form.descriptionNotes.filter((n) => n.trim()),
+      },
+      examples: form.examples.filter((ex) => ex.input.trim() || ex.output.trim()),
+      constraints: form.constraints.filter((c) => c.trim()),
+      functionName: form.functionName,
+      starterCode: form.starterCode,
+      testCases: form.testCases
+        .filter((tc) => tc.args.length > 0 || tc.expectedOutput.trim())
+        .map((tc) => ({
+          input: argsToJsonString(tc.args),
+          expectedOutput: tc.expectedOutput.trim(),
+          isHidden: tc.isHidden,
+        })),
+    };
+  };
 
   const mutation = useMutation({
     mutationFn: (payload) => adminApi.updateProblem(id, payload),
@@ -52,21 +200,10 @@ function AdminEditProblemPage() {
       toast.error("Title, category, and description are required");
       return;
     }
-
-    mutation.mutate({
-      title: form.title,
-      difficulty: form.difficulty,
-      category: form.category,
-      description: { text: form.descriptionText, notes: form.descriptionNotes.filter((n) => n.trim()) },
-      examples: form.examples.filter((ex) => ex.input.trim() || ex.output.trim()),
-      constraints: form.constraints.filter((c) => c.trim()),
-      functionName: form.functionName,
-      starterCode: form.starterCode,
-      testCases: form.testCases.filter((tc) => tc.input.trim() || tc.expectedOutput.trim()),
-      expectedOutput: form.expectedOutput,
-    });
+    mutation.mutate(buildPayload());
   };
 
+  /* ─── Array helpers ─── */
   const addArrayItem = (field, template) => {
     setForm((prev) => ({ ...prev, [field]: [...prev[field], template] }));
   };
@@ -77,6 +214,53 @@ function AdminEditProblemPage() {
 
   const updateArrayItem = (field, index, value) => {
     setForm((prev) => ({ ...prev, [field]: prev[field].map((item, i) => (i === index ? value : item)) }));
+  };
+
+  /* ─── Test-case argument helpers ─── */
+  const addArg = (tcIndex) => {
+    setForm((prev) => ({
+      ...prev,
+      testCases: prev.testCases.map((tc, i) =>
+        i === tcIndex ? { ...tc, args: [...tc.args, createEmptyArg()] } : tc
+      ),
+    }));
+  };
+
+  const removeArg = (tcIndex, argIndex) => {
+    setForm((prev) => ({
+      ...prev,
+      testCases: prev.testCases.map((tc, i) =>
+        i === tcIndex ? { ...tc, args: tc.args.filter((_, j) => j !== argIndex) } : tc
+      ),
+    }));
+  };
+
+  const updateArg = (tcIndex, argIndex, updates) => {
+    setForm((prev) => ({
+      ...prev,
+      testCases: prev.testCases.map((tc, i) =>
+        i === tcIndex
+          ? {
+              ...tc,
+              args: tc.args.map((arg, j) =>
+                j === argIndex
+                  ? {
+                      ...arg,
+                      ...updates,
+                      ...(updates.type && updates.type !== arg.type ? { value: defaultArgValue(updates.type) } : {}),
+                    }
+                  : arg
+              ),
+            }
+          : tc
+      ),
+    }));
+  };
+
+  const handleCopyJson = () => {
+    navigator.clipboard.writeText(JSON.stringify(buildPayload(), null, 2));
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
   if (isLoading || !form) {
@@ -230,18 +414,24 @@ function AdminEditProblemPage() {
           </div>
         </div>
 
-        {/* Test Cases */}
+        {/* Test Cases — structured argument builder */}
         <div className="card bg-base-100 shadow-md">
           <div className="card-body">
             <h2 className="card-title text-lg mb-2">Test Cases</h2>
             <p className="text-sm text-base-content/50 mb-3">
-              Define test cases with JSON-formatted inputs. Hidden test cases are used during submission but never shown to users.
+              Add function arguments using the structured builder below. Each argument has a type and a value.
+              For arrays, separate items with commas (e.g. <code className="text-xs bg-base-200 px-1 py-0.5 rounded">2, 7, 11, 15</code>).
             </p>
-            {form.testCases.map((tc, i) => (
-              <div key={i} className={`border rounded-lg p-4 mb-3 ${tc.isHidden ? "border-warning/40 bg-warning/5" : "border-base-300"}`}>
-                <div className="flex items-center justify-between mb-2">
+
+            {form.testCases.map((tc, tcIdx) => (
+              <div
+                key={tcIdx}
+                className={`border rounded-lg p-4 mb-3 ${tc.isHidden ? "border-warning/40 bg-warning/5" : "border-base-300"}`}
+              >
+                {/* Header */}
+                <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
-                    <span className="text-sm font-semibold text-base-content/60">Test Case {i + 1}</span>
+                    <span className="text-sm font-semibold text-base-content/60">Test Case {tcIdx + 1}</span>
                     {tc.isHidden && (
                       <span className="badge badge-warning badge-xs gap-1">
                         <EyeOffIcon className="size-3" /> Hidden
@@ -255,41 +445,138 @@ function AdminEditProblemPage() {
                         type="checkbox"
                         className="toggle toggle-warning toggle-xs"
                         checked={tc.isHidden}
-                        onChange={(e) => updateArrayItem("testCases", i, { ...tc, isHidden: e.target.checked })}
+                        onChange={(e) =>
+                          updateArrayItem("testCases", tcIdx, { ...tc, isHidden: e.target.checked })
+                        }
                       />
                     </label>
                     {form.testCases.length > 1 && (
-                      <button type="button" className="btn btn-ghost btn-xs text-error" onClick={() => removeArrayItem("testCases", i)}>
+                      <button
+                        type="button"
+                        className="btn btn-ghost btn-xs text-error"
+                        onClick={() => removeArrayItem("testCases", tcIdx)}
+                      >
                         <Trash2Icon className="size-3" />
                       </button>
                     )}
                   </div>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  <div className="form-control">
-                    <label className="label py-1"><span className="label-text text-xs">Input (JSON array of args)</span></label>
-                    <input
-                      type="text"
-                      className="input input-bordered input-sm font-mono"
-                      value={tc.input}
-                      onChange={(e) => updateArrayItem("testCases", i, { ...tc, input: e.target.value })}
-                      placeholder='e.g. [[2,7,11,15], 9]'
-                    />
+
+                {/* Arguments */}
+                <div className="mb-3">
+                  <label className="label py-1">
+                    <span className="label-text text-xs font-semibold">Function Arguments</span>
+                  </label>
+                  {tc.args.map((arg, argIdx) => (
+                    <div key={argIdx} className="flex items-start gap-2 mb-2">
+                      <div className="badge badge-ghost badge-sm mt-2 shrink-0 font-mono">
+                        arg {argIdx + 1}
+                      </div>
+                      <select
+                        className="select select-bordered select-xs w-36 shrink-0"
+                        value={arg.type}
+                        onChange={(e) => updateArg(tcIdx, argIdx, { type: e.target.value })}
+                      >
+                        {ARG_TYPES.map((t) => (
+                          <option key={t.value} value={t.value}>
+                            {t.label}
+                          </option>
+                        ))}
+                      </select>
+                      {arg.type === "boolean" ? (
+                        <select
+                          className="select select-bordered select-xs flex-1"
+                          value={arg.value}
+                          onChange={(e) => updateArg(tcIdx, argIdx, { value: e.target.value })}
+                        >
+                          <option value="true">true</option>
+                          <option value="false">false</option>
+                        </select>
+                      ) : arg.type === "null" ? (
+                        <input
+                          type="text"
+                          className="input input-bordered input-xs flex-1 opacity-50"
+                          value="null"
+                          disabled
+                        />
+                      ) : (
+                        <input
+                          type="text"
+                          className="input input-bordered input-xs flex-1 font-mono"
+                          value={arg.value}
+                          onChange={(e) => updateArg(tcIdx, argIdx, { value: e.target.value })}
+                          placeholder={
+                            arg.type === "number"
+                              ? "e.g. 9"
+                              : arg.type === "string"
+                              ? 'e.g. hello world'
+                              : arg.type === "number[]"
+                              ? "e.g. 2, 7, 11, 15"
+                              : arg.type === "string[]"
+                              ? "e.g. hello, world"
+                              : ""
+                          }
+                        />
+                      )}
+                      {tc.args.length > 1 && (
+                        <button
+                          type="button"
+                          className="btn btn-ghost btn-xs btn-circle text-error mt-0.5"
+                          onClick={() => removeArg(tcIdx, argIdx)}
+                        >
+                          <Trash2Icon className="size-3" />
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                  <button
+                    type="button"
+                    className="btn btn-ghost btn-xs w-fit gap-1"
+                    onClick={() => addArg(tcIdx)}
+                  >
+                    <PlusIcon className="size-3" /> Add Argument
+                  </button>
+
+                  {/* Live preview of generated input */}
+                  <div className="mt-2 text-xs text-base-content/40 font-mono bg-base-200/50 rounded px-2 py-1">
+                    Generated: <span className="text-base-content/70">{argsToJsonString(tc.args)}</span>
                   </div>
-                  <div className="form-control">
-                    <label className="label py-1"><span className="label-text text-xs">Expected Output</span></label>
-                    <input
-                      type="text"
-                      className="input input-bordered input-sm font-mono"
-                      value={tc.expectedOutput}
-                      onChange={(e) => updateArrayItem("testCases", i, { ...tc, expectedOutput: e.target.value })}
-                      placeholder='e.g. [0,1]'
-                    />
-                  </div>
+                </div>
+
+                {/* Expected output */}
+                <div className="form-control">
+                  <label className="label py-1">
+                    <span className="label-text text-xs font-semibold">Expected Output</span>
+                  </label>
+                  <input
+                    type="text"
+                    className="input input-bordered input-sm font-mono"
+                    value={tc.expectedOutput}
+                    onChange={(e) =>
+                      updateArrayItem("testCases", tcIdx, { ...tc, expectedOutput: e.target.value })
+                    }
+                    placeholder='e.g. [0,1] or [[-1,-1,2],[-1,0,1]] or true or "hello"'
+                  />
+                  <label className="label py-0.5">
+                    <span className="label-text-alt text-base-content/50">
+                      Include the outer brackets (e.g. <code className="bg-base-200 px-1 rounded font-mono text-[10px]">[[-1,-1,2],[-1,0,1]]</code>) to match the function's return value.
+                    </span>
+                  </label>
                 </div>
               </div>
             ))}
-            <button type="button" className="btn btn-ghost btn-sm w-fit gap-1" onClick={() => addArrayItem("testCases", { input: "", expectedOutput: "", isHidden: false })}>
+
+            <button
+              type="button"
+              className="btn btn-ghost btn-sm w-fit gap-1"
+              onClick={() =>
+                addArrayItem("testCases", {
+                  args: [createEmptyArg()],
+                  expectedOutput: "",
+                  isHidden: false,
+                })
+              }
+            >
               <PlusIcon className="size-4" /> Add Test Case
             </button>
           </div>
@@ -315,23 +602,37 @@ function AdminEditProblemPage() {
           </div>
         </div>
 
-        {/* Expected Output */}
+        {/* JSON Preview */}
         <div className="card bg-base-100 shadow-md">
-          <div className="card-body">
-            <h2 className="card-title text-lg mb-2">Expected Output (Legacy)</h2>
-            <p className="text-sm text-base-content/50 mb-3">
-              Optional — kept for backward compatibility. Test cases above are the primary verification method.
-            </p>
-            {["javascript", "python", "java"].map((lang) => (
-              <div key={lang} className="form-control mt-2">
-                <label className="label"><span className="label-text font-medium capitalize">{lang}</span></label>
-                <textarea
-                  className="textarea textarea-bordered font-mono text-sm h-20"
-                  value={form.expectedOutput[lang]}
-                  onChange={(e) => setForm({ ...form, expectedOutput: { ...form.expectedOutput, [lang]: e.target.value } })}
-                />
+          <div className="card-body p-4">
+            <button
+              type="button"
+              className="flex items-center gap-2 w-full text-left"
+              onClick={() => setShowJsonPreview(!showJsonPreview)}
+            >
+              <CodeIcon className="size-4 text-base-content/50" />
+              <span className="text-sm font-medium text-base-content/60">JSON Preview</span>
+              {showJsonPreview ? (
+                <ChevronUpIcon className="size-4 text-base-content/40 ml-auto" />
+              ) : (
+                <ChevronDownIcon className="size-4 text-base-content/40 ml-auto" />
+              )}
+            </button>
+            {showJsonPreview && (
+              <div className="mt-3 relative">
+                <button
+                  type="button"
+                  className="btn btn-ghost btn-xs absolute top-2 right-2 gap-1"
+                  onClick={handleCopyJson}
+                >
+                  {copied ? <CheckIcon className="size-3" /> : <CopyIcon className="size-3" />}
+                  {copied ? "Copied" : "Copy"}
+                </button>
+                <pre className="bg-base-200 rounded-lg p-4 text-xs font-mono overflow-x-auto max-h-96">
+                  {JSON.stringify(buildPayload(), null, 2)}
+                </pre>
               </div>
-            ))}
+            )}
           </div>
         </div>
 

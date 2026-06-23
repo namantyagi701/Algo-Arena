@@ -16,7 +16,7 @@ function AdminRoute({ children }) {
 
   if (!isLoaded) return null;
 
-  if (!isSignedIn) return <Navigate to="/login" replace />;
+  if (!isSignedIn) return <Navigate to="/admin/login" replace />;
 
   if (!isAdmin) return <Navigate to="/dashboard" replace />;
 

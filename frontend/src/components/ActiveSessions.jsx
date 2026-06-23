@@ -12,26 +12,26 @@ import { getDifficultyBadgeClass } from "../lib/utils";
 
 function ActiveSessions({ sessions, isLoading, isUserInSession }) {
   return (
-    <div className="lg:col-span-2 card bg-base-100 border-2 border-primary/20 hover:border-primary/30 h-full">
+    <div className="lg:col-span-2 card bg-base-100/90 backdrop-blur-sm border-2 border-primary/20 hover:border-primary/30 h-full transition-all duration-300">
       <div className="card-body">
         {/* HEADERS SECTION */}
         <div className="flex items-center justify-between mb-6">
           {/* TITLE AND ICON */}
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-gradient-to-br from-primary to-secondary rounded-xl">
-              <ZapIcon className="size-5" />
+            <div className="p-2 bg-gradient-to-br from-primary to-secondary rounded-xl shadow-md">
+              <ZapIcon className="size-5 text-white" />
             </div>
             <h2 className="text-2xl font-black">Live Sessions</h2>
           </div>
 
           <div className="flex items-center gap-2">
-            <div className="size-2 bg-success rounded-full" />
+            <div className="size-2 bg-success rounded-full animate-pulse" />
             <span className="text-sm font-medium text-success">{sessions.length} active</span>
           </div>
         </div>
 
         {/* SESSIONS LIST */}
-        <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2">
+        <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2 stagger-children">
           {isLoading ? (
             <div className="flex items-center justify-center py-20">
               <LoaderIcon className="size-10 animate-spin text-primary" />
@@ -40,14 +40,14 @@ function ActiveSessions({ sessions, isLoading, isUserInSession }) {
             sessions.map((session) => (
               <div
                 key={session._id}
-                className="card bg-base-200 border-2 border-base-300 hover:border-primary/50"
+                className="card bg-base-200/80 border-2 border-base-300 hover:border-primary/50 hover-glow transition-all duration-300"
               >
                 <div className="flex items-center justify-between gap-4 p-5">
                   {/* LEFT SIDE */}
                   <div className="flex items-center gap-4 flex-1">
-                    <div className="relative size-14 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
+                    <div className="relative size-14 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center shadow-md">
                       <Code2Icon className="size-7 text-white" />
-                      <div className="absolute -top-1 -right-1 size-4 bg-success rounded-full border-2 border-base-100" />
+                      <div className="absolute -top-1 -right-1 size-4 bg-success rounded-full border-2 border-base-100 animate-pulse" />
                     </div>
 
                     <div className="flex-1 min-w-0">
@@ -94,7 +94,7 @@ function ActiveSessions({ sessions, isLoading, isUserInSession }) {
             ))
           ) : (
             <div className="text-center py-16">
-              <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-3xl flex items-center justify-center">
+              <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-3xl flex items-center justify-center animate-float">
                 <SparklesIcon className="w-10 h-10 text-primary/50" />
               </div>
               <p className="text-lg font-semibold opacity-70 mb-1">No active sessions</p>

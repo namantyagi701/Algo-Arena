@@ -25,16 +25,20 @@ function SignupPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-base-100 via-base-200 to-base-300 flex items-center justify-center p-4">
-      <div className="card w-full max-w-md bg-base-100 shadow-2xl border border-base-300">
+    <div className="min-h-screen bg-gradient-to-br from-base-100 via-base-200 to-base-300 flex items-center justify-center p-4 relative noise-bg">
+      {/* Background glow orbs */}
+      <div className="absolute top-1/4 -left-20 w-72 h-72 bg-primary/8 rounded-full blur-[100px] pointer-events-none" />
+      <div className="absolute bottom-1/4 -right-20 w-64 h-64 bg-secondary/8 rounded-full blur-[80px] pointer-events-none" />
+
+      <div className="card w-full max-w-md bg-base-100/90 backdrop-blur-sm shadow-2xl border border-base-content/5 animate-slide-up relative z-10">
         <div className="card-body">
           {/* Logo */}
           <div className="flex items-center justify-center gap-3 mb-6">
-            <div className="size-10 rounded-xl bg-gradient-to-br from-primary via-secondary to-accent flex items-center justify-center shadow-lg">
+            <div className="size-10 rounded-xl bg-gradient-to-br from-primary via-secondary to-accent flex items-center justify-center shadow-lg animate-pulse-glow">
               <SparklesIcon className="size-6 text-white" />
             </div>
-            <span className="font-black text-2xl bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent font-mono tracking-wider">
-              Talent IQ
+            <span className="font-black text-2xl text-shimmer font-mono tracking-wider">
+              Algo Arena
             </span>
           </div>
 

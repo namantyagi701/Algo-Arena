@@ -19,12 +19,12 @@ function ProblemsPage() {
   const hardProblemsCount = problems.filter((p) => p.difficulty === "Hard").length;
 
   return (
-    <div className="min-h-screen bg-base-200">
+    <div className="min-h-screen bg-base-200 relative noise-bg">
       <Navbar />
 
-      <div className="max-w-6xl mx-auto px-4 py-12">
+      <div className="max-w-6xl mx-auto px-4 py-12 relative z-10">
         {/* HEADER */}
-        <div className="mb-8">
+        <div className="mb-8 animate-slide-up">
           <h1 className="text-4xl font-bold mb-2">Practice Problems</h1>
           <p className="text-base-content/70">
             Sharpen your coding skills with these curated problems
@@ -32,7 +32,7 @@ function ProblemsPage() {
         </div>
 
         {/* PROBLEMS LIST */}
-        <div className="space-y-4">
+        <div className="space-y-4 stagger-children">
           {isLoading ? (
             Array.from({ length: 3 }).map((_, i) => (
               <div key={i} className="card bg-base-100">
@@ -57,7 +57,7 @@ function ProblemsPage() {
               <Link
                 key={problem._id}
                 to={`/problem/${problem._id}`}
-                className="card bg-base-100 hover:scale-[1.01] transition-transform"
+                className="card bg-base-100/90 backdrop-blur-sm hover-glow border border-base-content/5 transition-all duration-300"
               >
                 <div className="card-body">
                   <div className="flex items-center justify-between gap-4">
@@ -82,7 +82,7 @@ function ProblemsPage() {
                       </p>
                     </div>
                     {/* RIGHT SIDE */}
-                    <div className="flex items-center gap-2 text-primary">
+                    <div className="flex items-center gap-2 text-primary group-hover:gap-3 transition-all">
                       <span className="font-medium">Solve</span>
                       <ChevronRightIcon className="size-5" />
                     </div>
@@ -95,7 +95,7 @@ function ProblemsPage() {
 
         {/* STATS FOOTER */}
         {!isLoading && problems.length > 0 && (
-          <div className="mt-12 card bg-base-100 shadow-lg">
+          <div className="mt-12 card bg-base-100/90 backdrop-blur-sm shadow-lg border border-base-content/5 animate-slide-up" style={{ animationDelay: '0.3s' }}>
             <div className="card-body">
               <div className="stats stats-vertical lg:stats-horizontal">
                 <div className="stat">

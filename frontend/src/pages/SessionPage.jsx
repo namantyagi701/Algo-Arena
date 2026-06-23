@@ -212,7 +212,7 @@ function SessionPage() {
               <Panel defaultSize={50} minSize={20}>
                 <div className="h-full overflow-y-auto bg-base-200">
                   {/* HEADER SECTION */}
-                  <div className="p-6 bg-base-100 border-b border-base-300">
+                  <div className="p-6 bg-base-100/90 backdrop-blur-sm border-b border-base-300/50">
                     <div className="flex items-start justify-between mb-3">
                       <div>
                         <h1 className="text-3xl font-bold text-base-content">
@@ -260,7 +260,7 @@ function SessionPage() {
                   <div className="p-6 space-y-6">
                     {/* problem desc */}
                     {problemData?.description && (
-                      <div className="bg-base-100 rounded-xl shadow-sm p-5 border border-base-300">
+                      <div className="bg-base-100/90 backdrop-blur-sm rounded-xl shadow-sm p-5 border border-base-content/5">
                         <h2 className="text-xl font-bold mb-4 text-base-content">Description</h2>
                         <div className="space-y-3 text-base leading-relaxed">
                           <p className="text-base-content/90">{problemData.description.text}</p>
@@ -275,7 +275,7 @@ function SessionPage() {
 
                     {/* examples section */}
                     {problemData?.examples && problemData.examples.length > 0 && (
-                      <div className="bg-base-100 rounded-xl shadow-sm p-5 border border-base-300">
+                      <div className="bg-base-100/90 backdrop-blur-sm rounded-xl shadow-sm p-5 border border-base-content/5">
                         <h2 className="text-xl font-bold mb-4 text-base-content">Examples</h2>
 
                         <div className="space-y-4">
@@ -285,7 +285,7 @@ function SessionPage() {
                                 <span className="badge badge-sm">{idx + 1}</span>
                                 <p className="font-semibold text-base-content">Example {idx + 1}</p>
                               </div>
-                              <div className="bg-base-200 rounded-lg p-4 font-mono text-sm space-y-1.5">
+                              <div className="bg-base-200/80 rounded-lg p-4 font-mono text-sm space-y-1.5 border border-base-content/5">
                                 <div className="flex gap-2">
                                   <span className="text-primary font-bold min-w-[70px]">
                                     Input:
@@ -315,7 +315,7 @@ function SessionPage() {
 
                     {/* Constraints */}
                     {problemData?.constraints && problemData.constraints.length > 0 && (
-                      <div className="bg-base-100 rounded-xl shadow-sm p-5 border border-base-300">
+                      <div className="bg-base-100/90 backdrop-blur-sm rounded-xl shadow-sm p-5 border border-base-content/5">
                         <h2 className="text-xl font-bold mb-4 text-base-content">Constraints</h2>
                         <ul className="space-y-2 text-base-content/90">
                           {problemData.constraints.map((constraint, idx) => (

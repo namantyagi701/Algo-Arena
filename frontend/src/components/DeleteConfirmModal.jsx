@@ -5,9 +5,9 @@ function DeleteConfirmModal({ isOpen, onClose, onConfirm, title, isDeleting }) {
 
   return (
     <div className="modal modal-open">
-      <div className="modal-box">
+      <div className="modal-box border border-error/15 shadow-2xl">
         <div className="flex items-center gap-3 mb-4">
-          <div className="size-12 rounded-full bg-error/10 flex items-center justify-center">
+          <div className="size-12 rounded-full bg-error/10 flex items-center justify-center animate-subtle-bounce">
             <AlertTriangleIcon className="size-6 text-error" />
           </div>
           <div>
@@ -17,7 +17,7 @@ function DeleteConfirmModal({ isOpen, onClose, onConfirm, title, isDeleting }) {
         </div>
 
         <p className="py-2">
-          Are you sure you want to delete <span className="font-semibold">"{title}"</span>?
+          Are you sure you want to delete <span className="font-semibold text-error">"{title}"</span>?
         </p>
 
         <div className="modal-action">

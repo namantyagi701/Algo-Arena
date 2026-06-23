@@ -16,13 +16,13 @@ function Navbar() {
           to="/"
           className="group flex items-center gap-3 hover:scale-105 transition-transform duration-200"
         >
-          <div className="size-10 rounded-xl bg-gradient-to-r from-primary via-secondary to-accent flex items-center justify-center shadow-lg ">
+          <div className="size-10 rounded-xl bg-gradient-to-r from-primary via-secondary to-accent flex items-center justify-center shadow-lg animate-pulse-glow">
             <SparklesIcon className="size-6 text-white" />
           </div>
 
           <div className="flex flex-col">
-            <span className="font-black text-xl bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent font-mono tracking-wider">
-              Talent IQ
+            <span className="font-black text-xl text-shimmer font-mono tracking-wider">
+              Algo Arena
             </span>
             <span className="text-xs text-base-content/60 font-medium -mt-1">Code Together</span>
           </div>
@@ -35,7 +35,7 @@ function Navbar() {
             className={`px-4 py-2.5 rounded-lg transition-all duration-200 
               ${
                 isActive("/problems")
-                  ? "bg-primary text-primary-content"
+                  ? "bg-primary text-primary-content shadow-md"
                   : "hover:bg-base-200 text-base-content/70 hover:text-base-content"
               }
               
@@ -53,7 +53,7 @@ function Navbar() {
             className={`px-4 py-2.5 rounded-lg transition-all duration-200 
               ${
                 isActive("/dashboard")
-                  ? "bg-primary text-primary-content"
+                  ? "bg-primary text-primary-content shadow-md"
                   : "hover:bg-base-200 text-base-content/70 hover:text-base-content"
               }
               
@@ -61,7 +61,7 @@ function Navbar() {
           >
             <div className="flex items-center gap-x-2.5">
               <LayoutDashboardIcon className="size-4" />
-              <span className="font-medium hidden sm:inline">Dashbord</span>
+              <span className="font-medium hidden sm:inline">Dashboard</span>
             </div>
           </Link>
 
@@ -72,7 +72,7 @@ function Navbar() {
               className={`px-4 py-2.5 rounded-lg transition-all duration-200 
                 ${
                   location.pathname.startsWith("/admin")
-                    ? "bg-primary text-primary-content"
+                    ? "bg-primary text-primary-content shadow-md"
                     : "hover:bg-base-200 text-base-content/70 hover:text-base-content"
                 }
               `}
@@ -87,7 +87,7 @@ function Navbar() {
           {/* User avatar + logout dropdown */}
           <div className="dropdown dropdown-end ml-4">
             <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar">
-              <div className="w-10 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
+              <div className="w-10 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2 transition-shadow duration-300 hover:shadow-[0_0_16px_oklch(var(--p)/0.3)]">
                 {user?.profileImage ? (
                   <img src={user.profileImage} alt={user.name} />
                 ) : (

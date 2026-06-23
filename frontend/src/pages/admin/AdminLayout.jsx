@@ -28,14 +28,14 @@ function AdminLayout() {
   const sidebar = (
     <div className="flex flex-col h-full">
       {/* Logo */}
-      <div className="p-6 border-b border-base-300">
-        <Link to="/admin" className="flex items-center gap-3">
-          <div className="size-10 rounded-xl bg-gradient-to-r from-primary via-secondary to-accent flex items-center justify-center shadow-lg">
+      <div className="p-6 border-b border-base-300/50">
+        <Link to="/admin" className="flex items-center gap-3 group">
+          <div className="size-10 rounded-xl bg-gradient-to-r from-primary via-secondary to-accent flex items-center justify-center shadow-lg animate-pulse-glow">
             <SparklesIcon className="size-6 text-white" />
           </div>
           <div className="flex flex-col">
-            <span className="font-black text-lg bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent font-mono tracking-wider">
-              Talent IQ
+            <span className="font-black text-lg text-shimmer font-mono tracking-wider">
+              Algo Arena
             </span>
             <span className="text-xs text-base-content/50 font-medium -mt-1">Admin Panel</span>
           </div>
@@ -68,9 +68,9 @@ function AdminLayout() {
       </nav>
 
       {/* User section */}
-      <div className="p-4 border-t border-base-300">
+      <div className="p-4 border-t border-base-300/50">
         <div className="flex items-center gap-3 mb-3 px-2">
-          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white font-bold text-sm">
+          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white font-bold text-sm shadow-md">
             {user?.name?.charAt(0)?.toUpperCase() || "?"}
           </div>
           <div className="flex-1 min-w-0">
@@ -92,15 +92,15 @@ function AdminLayout() {
   return (
     <div className="min-h-screen bg-base-200 flex">
       {/* Desktop sidebar */}
-      <aside className="hidden lg:flex w-64 bg-base-100 border-r border-base-300 flex-col fixed h-screen">
+      <aside className="hidden lg:flex w-64 bg-base-100 border-r border-base-300/50 flex-col fixed h-screen shadow-lg">
         {sidebar}
       </aside>
 
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (
         <div className="fixed inset-0 z-50 lg:hidden">
-          <div className="absolute inset-0 bg-black/50" onClick={() => setSidebarOpen(false)} />
-          <aside className="absolute left-0 top-0 bottom-0 w-64 bg-base-100 shadow-xl">
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setSidebarOpen(false)} />
+          <aside className="absolute left-0 top-0 bottom-0 w-64 bg-base-100 shadow-xl animate-slide-up">
             <button
               className="absolute top-4 right-4 btn btn-ghost btn-sm btn-circle"
               onClick={() => setSidebarOpen(false)}
@@ -115,14 +115,14 @@ function AdminLayout() {
       {/* Main content */}
       <main className="flex-1 lg:ml-64">
         {/* Mobile header */}
-        <div className="lg:hidden sticky top-0 z-40 bg-base-100 border-b border-base-300 px-4 py-3 flex items-center gap-3">
+        <div className="lg:hidden sticky top-0 z-40 bg-base-100/80 backdrop-blur-md border-b border-base-300 px-4 py-3 flex items-center gap-3">
           <button
             className="btn btn-ghost btn-sm btn-square"
             onClick={() => setSidebarOpen(true)}
           >
             <MenuIcon className="size-5" />
           </button>
-          <span className="font-bold text-lg bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+          <span className="font-bold text-lg text-shimmer">
             Admin Panel
           </span>
         </div>

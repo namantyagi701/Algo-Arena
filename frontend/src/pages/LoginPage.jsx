@@ -38,16 +38,20 @@ function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-base-100 via-base-200 to-base-300 flex items-center justify-center p-4">
-      <div className="card w-full max-w-md bg-base-100 shadow-2xl border border-base-300">
+    <div className="min-h-screen bg-gradient-to-br from-base-100 via-base-200 to-base-300 flex items-center justify-center p-4 relative noise-bg">
+      {/* Background glow orbs */}
+      <div className="absolute top-1/3 -left-20 w-72 h-72 bg-primary/8 rounded-full blur-[100px] pointer-events-none" />
+      <div className="absolute bottom-1/3 -right-20 w-64 h-64 bg-secondary/8 rounded-full blur-[80px] pointer-events-none" />
+
+      <div className="card w-full max-w-md bg-base-100/90 backdrop-blur-sm shadow-2xl border border-base-content/5 animate-slide-up relative z-10">
         <div className="card-body">
           {/* Logo */}
           <div className="flex items-center justify-center gap-3 mb-6">
-            <div className="size-10 rounded-xl bg-gradient-to-br from-primary via-secondary to-accent flex items-center justify-center shadow-lg">
+            <div className="size-10 rounded-xl bg-gradient-to-br from-primary via-secondary to-accent flex items-center justify-center shadow-lg animate-pulse-glow">
               <SparklesIcon className="size-6 text-white" />
             </div>
-            <span className="font-black text-2xl bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent font-mono tracking-wider">
-              Talent IQ
+            <span className="font-black text-2xl text-shimmer font-mono tracking-wider">
+              Algo Arena
             </span>
           </div>
 
@@ -55,11 +59,11 @@ function LoginPage() {
           <p className="text-center text-base-content/60 mb-4">Sign in to continue</p>
 
           {/* Login Mode Toggle */}
-          <div className="flex bg-base-200 rounded-xl p-1 mb-6">
+          <div className="flex bg-base-200/80 rounded-xl p-1 mb-6">
             <button
               type="button"
               onClick={() => setLoginMode("student")}
-              className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200
+              className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-semibold transition-all duration-300
                 ${!isAdminMode
                   ? "bg-primary text-primary-content shadow-md"
                   : "text-base-content/60 hover:text-base-content"
@@ -71,7 +75,7 @@ function LoginPage() {
             <button
               type="button"
               onClick={() => setLoginMode("admin")}
-              className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200
+              className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-semibold transition-all duration-300
                 ${isAdminMode
                   ? "bg-error text-error-content shadow-md"
                   : "text-base-content/60 hover:text-base-content"
@@ -99,7 +103,7 @@ function LoginPage() {
                 <MailIcon className="size-4 text-base-content/40" />
                 <input
                   type="email"
-                  placeholder={isAdminMode ? "admin@talentiq.com" : "you@example.com"}
+                  placeholder={isAdminMode ? "admin@algoarena.com" : "you@example.com"}
                   className="grow"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}

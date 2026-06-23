@@ -1,4 +1,4 @@
-import { Code2Icon, LoaderIcon, PlusIcon } from "lucide-react";
+import { Code2Icon, LoaderIcon, PlusIcon, SparklesIcon } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { problemsApi } from "../api/problems";
 
@@ -22,8 +22,13 @@ function CreateSessionModal({
 
   return (
     <div className="modal modal-open">
-      <div className="modal-box max-w-2xl">
-        <h3 className="font-bold text-2xl mb-6">Create New Session</h3>
+      <div className="modal-box max-w-2xl border border-base-content/5 shadow-2xl">
+        <div className="flex items-center gap-3 mb-6">
+          <div className="size-10 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center shadow-md">
+            <SparklesIcon className="size-5 text-white" />
+          </div>
+          <h3 className="font-bold text-2xl">Create New Session</h3>
+        </div>
 
         <div className="space-y-8">
           {/* PROBLEM SELECTION */}
@@ -34,7 +39,7 @@ function CreateSessionModal({
             </label>
 
             <select
-              className="select w-full"
+              className="select w-full bg-base-200/50"
               value={roomConfig.problem}
               onChange={(e) => {
                 const selectedProblem = problems.find((p) => p.title === e.target.value);

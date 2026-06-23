@@ -1,12 +1,15 @@
-import { CheckCircleIcon, XCircleIcon, EyeOffIcon } from "lucide-react";
+import { CheckCircleIcon, XCircleIcon, EyeOffIcon, TerminalIcon } from "lucide-react";
 
 function OutputPanel({ output, submitResult }) {
   // If there's a submit result, show that
   if (submitResult) {
     return (
       <div className="h-full bg-base-100 flex flex-col">
-        <div className="px-4 py-2 bg-base-200 border-b border-base-300 font-semibold text-sm flex items-center justify-between">
-          <span>Submission Results</span>
+        <div className="px-4 py-2 bg-base-200/80 backdrop-blur-sm border-b border-base-300/50 font-semibold text-sm flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <TerminalIcon className="size-3.5 text-base-content/50" />
+            <span>Submission Results</span>
+          </div>
           {submitResult.allPassed ? (
             <span className="badge badge-success badge-sm gap-1">
               <CheckCircleIcon className="size-3" />
@@ -44,7 +47,7 @@ function OutputPanel({ output, submitResult }) {
           {submitResult.results?.map((result) => (
             <div
               key={result.testCase}
-              className={`border rounded-lg p-3 ${
+              className={`border rounded-lg p-3 transition-colors duration-200 ${
                 result.passed
                   ? "border-success/30 bg-success/5"
                   : "border-error/30 bg-error/5"
@@ -99,12 +102,16 @@ function OutputPanel({ output, submitResult }) {
   // Default: show run output
   return (
     <div className="h-full bg-base-100 flex flex-col">
-      <div className="px-4 py-2 bg-base-200 border-b border-base-300 font-semibold text-sm">
+      <div className="px-4 py-2 bg-base-200/80 backdrop-blur-sm border-b border-base-300/50 font-semibold text-sm flex items-center gap-2">
+        <TerminalIcon className="size-3.5 text-base-content/50" />
         Output
       </div>
       <div className="flex-1 overflow-auto p-4">
         {output === null ? (
-          <p className="text-base-content/50 text-sm">Click "Run Code" to see the output here...</p>
+          <div className="flex flex-col items-center justify-center h-full text-base-content/40">
+            <TerminalIcon className="size-8 mb-2 opacity-30" />
+            <p className="text-sm">Click &quot;Run Code&quot; to see the output here...</p>
+          </div>
         ) : output.testResults ? (
           // Run with test cases result
           <div className="space-y-3">
@@ -121,7 +128,7 @@ function OutputPanel({ output, submitResult }) {
             {output.testResults.map((result) => (
               <div
                 key={result.testCase}
-                className={`border rounded-lg p-3 ${
+                className={`border rounded-lg p-3 transition-colors duration-200 ${
                   result.passed
                     ? "border-success/30 bg-success/5"
                     : "border-error/30 bg-error/5"

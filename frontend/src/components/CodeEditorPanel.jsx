@@ -14,14 +14,14 @@ function CodeEditorPanel({
 }) {
   return (
     <div className="h-full bg-base-300 flex flex-col">
-      <div className="flex items-center justify-between px-4 py-3 bg-base-100 border-t border-base-300">
+      <div className="flex items-center justify-between px-4 py-3 bg-base-100/90 backdrop-blur-sm border-t border-base-300/50">
         <div className="flex items-center gap-3">
           <img
             src={LANGUAGE_CONFIG[selectedLanguage].icon}
             alt={LANGUAGE_CONFIG[selectedLanguage].name}
             className="size-6"
           />
-          <select className="select select-sm" value={selectedLanguage} onChange={onLanguageChange}>
+          <select className="select select-sm bg-base-200/50" value={selectedLanguage} onChange={onLanguageChange}>
             {Object.entries(LANGUAGE_CONFIG).map(([key, lang]) => (
               <option key={key} value={key}>
                 {lang.name}
@@ -32,7 +32,7 @@ function CodeEditorPanel({
 
         <div className="flex items-center gap-2">
           <button
-            className="btn btn-outline btn-sm gap-2"
+            className="btn btn-outline btn-sm gap-2 hover-glow"
             disabled={isRunning || isSubmitting}
             onClick={onRunCode}
           >
@@ -79,11 +79,17 @@ function CodeEditorPanel({
           onChange={onCodeChange}
           theme="vs-dark"
           options={{
-            fontSize: 16,
+            fontSize: 15,
+            fontFamily: "'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace",
             lineNumbers: "on",
             scrollBeyondLastLine: false,
             automaticLayout: true,
             minimap: { enabled: false },
+            padding: { top: 16 },
+            renderLineHighlight: "gutter",
+            smoothScrolling: true,
+            cursorBlinking: "smooth",
+            cursorSmoothCaretAnimation: "on",
           }}
         />
       </div>
