@@ -12,7 +12,7 @@ const setCookie = (res, token) => {
   res.cookie("jwt", token, {
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     httpOnly: true, // prevents XSS attacks
-    sameSite: ENV.NODE_ENV === "production" ? "strict" : "lax", // lax for cross-port dev
+    sameSite: ENV.NODE_ENV === "production" ? "none" : "lax", // lax for cross-port dev
     secure: ENV.NODE_ENV === "production",
   });
 };
